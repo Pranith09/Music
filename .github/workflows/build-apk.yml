@@ -1,0 +1,81 @@
+name: Build Offline Music App APK
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Android Release APKs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Flutter Dependencies
+        run: flutter pub get
+
+      - name: Build Universal Release APK
+        run: flutter build apk --release
+
+      - name: Build Split ARM64 Release APK (Optimized for Realme Narzo 60 5G)
+        run: flutter build apk --release --split-per-abi
+
+      - name: Rename & Organize APKs
+        run: |
+          mkdir -p output-apks
+          cp build/app/outputs/flutter-apk/app-release.apk output-apks/AuraMusic-Universal-v1.0.apk
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk output-apks/AuraMusic-arm64-v8a-RealmeNarzo60.apk || true
+
+      - name: Upload APKs to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AuraMusic-Android-APKs
+          path: output-apks/*
+          retention-days: 30
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-${{ github.run_number }}
+          name: Aura Music v1.0.0 (Build ${{ github.run_number }})
+          body: |
+            ### 🎵 Aura Music Player - Release Build ${{ github.run_number }}
+            
+            **Optimized for:** Realme Narzo 60 5G & all Android 8.0+ devices.
+            
+            #### 📥 Download Instructions:
+            - **For Realme Narzo 60 5G (Fastest & Smallest)**: Download `AuraMusic-arm64-v8a-RealmeNarzo60.apk`
+            - **For Any Android Device**: Download `AuraMusic-Universal-v1.0.apk`
+            
+            #### ✨ Highlights:
+            - 100% Offline playback (No internet required)
+            - Scans downloaded audio files (`.mp3`, `.m4a`, `.flac`, `.wav`, `.aac`)
+            - Background playback with Lock Screen & Notification media controls
+            - AMOLED pure dark theme
+            - Custom playlists, favorites & sleep timer
+          files: |
+            output-apks/AuraMusic-Universal-v1.0.apk
+            output-apks/AuraMusic-arm64-v8a-RealmeNarzo60.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
