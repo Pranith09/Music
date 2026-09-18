@@ -35,7 +35,7 @@ jobs:
         run: |
           flutter config --no-analytics
           # Generate fresh, official Flutter android scaffold matching the runner's SDK
-          flutter create temp_scaffold --org com.pranith --project-name music --platforms android
+          flutter create --org com.pranith --project-name music --platforms android temp_scaffold
           rm -rf android
           cp -r temp_scaffold/android android
           rm -rf temp_scaffold
@@ -43,8 +43,10 @@ jobs:
       - name: Configure Android Audio Permissions & Manifest
         run: |
           # Set minimum SDK to 23 for modern audio features
-          sed -i 's/minSdkVersion.*/minSdkVersion = 23/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion .*/minSdkVersion 23/g' android/app/build.gradle || true
+          sed -i 's/minSdkVersion = .*/minSdkVersion = 23/g' android/app/build.gradle || true
           sed -i 's/minSdk = .*/minSdk = 23/g' android/app/build.gradle || true
+          sed -i 's/minSdk .*/minSdk 23/g' android/app/build.gradle || true
 
           # Inject Audio Permissions and Background AudioService into AndroidManifest.xml
           cat << 'EOF' > android/app/src/main/AndroidManifest.xml
