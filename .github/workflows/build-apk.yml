@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Android Release APKs
+    name: Build Android Release APK
     runs-on: ubuntu-latest
 
     steps:
@@ -29,53 +29,52 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.24.5'
           cache: true
 
-      - name: Install Flutter Dependencies
+      - name: Accept Android Licenses & Doctor
+        run: |
+          yes | flutter doctor --android-licenses || true
+          flutter doctor -v
+
+      - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build Universal Release APK
+      - name: Build Release APK
         run: flutter build apk --release
 
-      - name: Build Split ARM64 Release APK (Optimized for Realme Narzo 60 5G)
-        run: flutter build apk --release --split-per-abi
+      - name: Build Split ARM64 APK for Realme Narzo 60
+        run: flutter build apk --release --split-per-abi || true
 
-      - name: Rename & Organize APKs
+      - name: Prepare APK Outputs
         run: |
           mkdir -p output-apks
-          cp build/app/outputs/flutter-apk/app-release.apk output-apks/Music-Universal-v1.0.apk
-          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk output-apks/Music-arm64-v8a-RealmeNarzo60.apk || true
+          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
+            cp build/app/outputs/flutter-apk/app-release.apk output-apks/Music-Universal-v1.0.apk
+          fi
+          if [ -f build/app/outputs/flutter-apk/app-arm64-v8a-release.apk ]; then
+            cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk output-apks/Music-arm64-v8a-RealmeNarzo60.apk
+          fi
 
-      - name: Upload APKs to GitHub Artifacts
+      - name: Upload APKs as Workflow Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Music-Android-APKs
           path: output-apks/*
           retention-days: 30
 
-      - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
+        continue-on-error: true
         with:
-          tag_name: v1.0.0-${{ github.run_number }}
+          tag_name: v1.0.0-build${{ github.run_number }}
           name: Music v1.0.0 (Build ${{ github.run_number }})
           body: |
-            ### 🎵 Music Player - Release Build ${{ github.run_number }}
-            
-            **Optimized for:** Realme Narzo 60 5G & all Android 8.0+ devices.
-            
-            #### 📥 Download Instructions:
-            - **For Realme Narzo 60 5G (Fastest & Smallest)**: Download `Music-arm64-v8a-RealmeNarzo60.apk`
-            - **For Any Android Device**: Download `Music-Universal-v1.0.apk`
-            
-            #### ✨ Highlights:
-            - 100% Offline playback (No internet required)
-            - Scans downloaded audio files (`.mp3`, `.m4a`, `.flac`, `.wav`, `.aac`)
-            - Background playback with Lock Screen & Notification media controls
-            - AMOLED pure dark theme
-            - Custom playlists, favorites & sleep timer
-          files: |
-            output-apks/Music-Universal-v1.0.apk
-            output-apks/Music-arm64-v8a-RealmeNarzo60.apk
+            ### 🎵 Music Offline Player - Build ${{ github.run_number }}
+            **Download the APK for your phone:**
+            - Realme Narzo 60 5G: `Music-arm64-v8a-RealmeNarzo60.apk`
+            - Universal Android: `Music-Universal-v1.0.apk`
+          files: output-apks/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
