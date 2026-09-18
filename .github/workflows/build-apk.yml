@@ -32,8 +32,9 @@ jobs:
           flutter-version: '3.24.5'
           cache: true
 
-      - name: Accept Android Licenses & Pre-cache
+      - name: Pre-cache and Doctor
         run: |
+          flutter config --no-analytics
           yes | flutter doctor --android-licenses || true
           flutter doctor -v
 
@@ -41,33 +42,16 @@ jobs:
         run: flutter pub get
 
       - name: Build Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
-      - name: Organize APK Files
+      - name: Organize APK Output
         run: |
           mkdir -p output-apks
-          if [ -f build/app/outputs/flutter-apk/app-release.apk ]; then
-            cp build/app/outputs/flutter-apk/app-release.apk output-apks/Music-RealmeNarzo60.apk
-          fi
+          cp build/app/outputs/flutter-apk/app-release.apk output-apks/Music-RealmeNarzo60.apk
 
-      - name: Upload APK as Workflow Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Music-Android-APK
-          path: output-apks/*
+          path: output-apks/Music-RealmeNarzo60.apk
           retention-days: 30
-
-      - name: Publish GitHub Release
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
-        continue-on-error: true
-        with:
-          tag_name: v1.0.0-build${{ github.run_number }}
-          name: Music v1.0.0 (Build ${{ github.run_number }})
-          body: |
-            ### 🎵 Music Offline Player
-            - Optimized for Realme Narzo 60 5G & Android 8.0+
-            - Download `Music-RealmeNarzo60.apk` below and install directly!
-          files: output-apks/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
