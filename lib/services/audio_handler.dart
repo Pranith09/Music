@@ -5,10 +5,10 @@ import '../models/song_model.dart';
 
 Future<AudioHandler> initAudioService() async {
   return await AudioService.init(
-    builder: () => AuraAudioHandler(),
+    builder: () => MusicAudioHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.pranith.aura_music.playback',
-      androidNotificationChannelName: 'Aura Music Playback',
+      androidNotificationChannelId: 'com.pranith.music.playback',
+      androidNotificationChannelName: 'Music Playback',
       androidNotificationChannelDescription: 'Offline Music Playback Controls',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: false,
@@ -18,7 +18,7 @@ Future<AudioHandler> initAudioService() async {
   );
 }
 
-class AuraAudioHandler extends BaseAudioHandler with SeekHandler {
+class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
   final AudioPlayer _player = AudioPlayer();
   List<SongItem> _playlist = [];
   int _currentIndex = -1;

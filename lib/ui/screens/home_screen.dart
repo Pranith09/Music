@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   ),
                   const SizedBox(width: 10),
                   const Text(
-                    'Aura Music',
+                    'Music',
                     style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
                   ),
                 ],
@@ -390,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
             const SizedBox(height: 10),
             const Text(
-              'Aura Music needs permission to read audio files from your Realme Narzo 60 storage to play your music offline.',
+              'Music needs permission to read audio files from your Realme Narzo 60 storage to play your music offline.',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppTheme.textMuted),
             ),

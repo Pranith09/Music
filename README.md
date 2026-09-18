@@ -1,4 +1,4 @@
-# 🎵 Aura Music Player
+# 🎵 Music Player
 
 An ultra-sleek, lightweight, 100% offline music player designed for Android (optimized for **Realme Narzo 60 5G** and modern Android 13/14 devices).
 
@@ -22,7 +22,7 @@ An ultra-sleek, lightweight, 100% offline music player designed for Android (opt
 ### Step 1: Download the `.apk`
 1. Open this repository on your phone's browser: [https://github.com/Pranith09/Music](https://github.com/Pranith09/Music)
 2. Go to **Actions** (or the **Releases** section on the right/bottom).
-3. Tap on the latest build run, scroll down to **Artifacts**, and tap **`AuraMusic-Android-APKs`** (or download `AuraMusic-arm64-v8a-RealmeNarzo60.apk` from Releases).
+3. Tap on the latest build run, scroll down to **Artifacts**, and tap **`Music-Android-APKs`** (or download `Music-arm64-v8a-RealmeNarzo60.apk` from Releases).
 
 ### Step 2: Install the App
 1. Open the downloaded `.apk` file from your phone's **Downloads** or **Files** app.
@@ -30,7 +30,7 @@ An ultra-sleek, lightweight, 100% offline music player designed for Android (opt
 3. Tap **Install**.
 
 ### Step 3: Grant Audio Permission
-1. Open **Aura Music**.
+1. Open **Music**.
 2. When prompted, tap **Allow** for *Music & Audio* storage access.
 3. Your offline songs will automatically be scanned and ready to play!
 

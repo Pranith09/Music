@@ -27,20 +27,20 @@ void main() async {
   final scannerService = MediaScannerService();
 
   runApp(
-    AuraMusicApp(
-      audioHandler: audioHandler as AuraAudioHandler,
+    MusicApp(
+      audioHandler: audioHandler as MusicAudioHandler,
       storageService: storageService,
       scannerService: scannerService,
     ),
   );
 }
 
-class AuraMusicApp extends StatelessWidget {
-  final AuraAudioHandler audioHandler;
+class MusicApp extends StatelessWidget {
+  final MusicAudioHandler audioHandler;
   final StorageService storageService;
   final MediaScannerService scannerService;
 
-  const AuraMusicApp({
+  const MusicApp({
     Key? key,
     required this.audioHandler,
     required this.storageService,
@@ -56,7 +56,7 @@ class AuraMusicApp extends StatelessWidget {
         scannerService: scannerService,
       ),
       child: MaterialApp(
-        title: 'Aura Music',
+        title: 'Music',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
         home: const HomeScreen(),

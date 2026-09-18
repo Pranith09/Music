@@ -8,7 +8,7 @@ import 'media_scanner_service.dart';
 import 'storage_service.dart';
 
 class AudioPlayerService extends ChangeNotifier {
-  final AuraAudioHandler _audioHandler;
+  final MusicAudioHandler _audioHandler;
   final StorageService _storageService;
   final MediaScannerService _scannerService;
 
@@ -47,7 +47,7 @@ class AudioPlayerService extends ChangeNotifier {
   List<SongItem> get favoriteSongs => _allSongs.where((s) => _favoriteIds.contains(s.id)).toList();
   List<SongItem> get recentlyPlayed => _recentlyPlayedSongs;
 
-  AuraAudioHandler get handler => _audioHandler;
+  MusicAudioHandler get handler => _audioHandler;
   SongItem? get currentSong => _audioHandler.currentSong;
   List<SongItem> get currentQueue => _audioHandler.playlist;
   int get currentIndex => _audioHandler.currentIndex;
@@ -57,7 +57,7 @@ class AudioPlayerService extends ChangeNotifier {
   Stream<PlayerState> get playerStateStream => _audioHandler.player.playerStateStream;
 
   AudioPlayerService({
-    required AuraAudioHandler audioHandler,
+    required MusicAudioHandler audioHandler,
     required StorageService storageService,
     required MediaScannerService scannerService,
   })  : _audioHandler = audioHandler,

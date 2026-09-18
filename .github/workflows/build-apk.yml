@@ -43,13 +43,13 @@ jobs:
       - name: Rename & Organize APKs
         run: |
           mkdir -p output-apks
-          cp build/app/outputs/flutter-apk/app-release.apk output-apks/AuraMusic-Universal-v1.0.apk
-          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk output-apks/AuraMusic-arm64-v8a-RealmeNarzo60.apk || true
+          cp build/app/outputs/flutter-apk/app-release.apk output-apks/Music-Universal-v1.0.apk
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk output-apks/Music-arm64-v8a-RealmeNarzo60.apk || true
 
       - name: Upload APKs to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: AuraMusic-Android-APKs
+          name: Music-Android-APKs
           path: output-apks/*
           retention-days: 30
 
@@ -58,15 +58,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.0-${{ github.run_number }}
-          name: Aura Music v1.0.0 (Build ${{ github.run_number }})
+          name: Music v1.0.0 (Build ${{ github.run_number }})
           body: |
-            ### 🎵 Aura Music Player - Release Build ${{ github.run_number }}
+            ### 🎵 Music Player - Release Build ${{ github.run_number }}
             
             **Optimized for:** Realme Narzo 60 5G & all Android 8.0+ devices.
             
             #### 📥 Download Instructions:
-            - **For Realme Narzo 60 5G (Fastest & Smallest)**: Download `AuraMusic-arm64-v8a-RealmeNarzo60.apk`
-            - **For Any Android Device**: Download `AuraMusic-Universal-v1.0.apk`
+            - **For Realme Narzo 60 5G (Fastest & Smallest)**: Download `Music-arm64-v8a-RealmeNarzo60.apk`
+            - **For Any Android Device**: Download `Music-Universal-v1.0.apk`
             
             #### ✨ Highlights:
             - 100% Offline playback (No internet required)
@@ -75,7 +75,7 @@ jobs:
             - AMOLED pure dark theme
             - Custom playlists, favorites & sleep timer
           files: |
-            output-apks/AuraMusic-Universal-v1.0.apk
-            output-apks/AuraMusic-arm64-v8a-RealmeNarzo60.apk
+            output-apks/Music-Universal-v1.0.apk
+            output-apks/Music-arm64-v8a-RealmeNarzo60.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
