@@ -26,50 +26,37 @@ class SongTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap ?? () => playerService.playSong(song, contextPlaylist: contextPlaylist),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isCurrentSong ? AppTheme.primary.withOpacity(0.12) : Colors.transparent,
-          borderRadius: BorderRadius.circular(14),
+          color: isCurrentSong ? AppTheme.accent.withOpacity(0.12) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            // Album Artwork Thumbnail
             ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
               child: SizedBox(
-                width: 52,
-                height: 52,
+                width: 48,
+                height: 48,
                 child: QueryArtworkWidget(
                   id: song.id,
                   type: ArtworkType.AUDIO,
-                  artworkBorder: BorderRadius.circular(10),
+                  artworkBorder: BorderRadius.circular(8),
                   artworkFit: BoxFit.cover,
                   nullArtworkWidget: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          isCurrentSong ? AppTheme.primary : AppTheme.surfaceElevated,
-                          AppTheme.cardColor,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    color: isCurrentSong ? AppTheme.accent.withOpacity(0.3) : AppTheme.surfaceElevated,
                     child: Icon(
                       Icons.music_note_rounded,
-                      color: isCurrentSong ? Colors.white : AppTheme.textMuted,
-                      size: 26,
+                      color: isCurrentSong ? AppTheme.accentGlow : AppTheme.textMuted,
+                      size: 24,
                     ),
                   ),
                 ),
               ),
             ),
             const SizedBox(width: 14),
-
-            // Song Info (Title & Artist)
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +67,7 @@ class SongTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: isCurrentSong ? AppTheme.primaryAccent : AppTheme.textPrimary,
+                      color: isCurrentSong ? AppTheme.accentGlow : AppTheme.textPrimary,
                       fontWeight: isCurrentSong ? FontWeight.bold : FontWeight.w600,
                       fontSize: 15,
                     ),
@@ -89,7 +76,7 @@ class SongTile extends StatelessWidget {
                   Row(
                     children: [
                       if (isPlaying) ...[
-                        const Icon(Icons.graphic_eq_rounded, size: 14, color: AppTheme.primary),
+                        const Icon(Icons.graphic_eq_rounded, size: 14, color: AppTheme.accent),
                         const SizedBox(width: 4),
                       ],
                       Expanded(
@@ -98,7 +85,7 @@ class SongTile extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: isCurrentSong ? AppTheme.primary.withOpacity(0.8) : AppTheme.textMuted,
+                            color: isCurrentSong ? AppTheme.accent.withOpacity(0.8) : AppTheme.textMuted,
                             fontSize: 13,
                           ),
                         ),
@@ -116,153 +103,17 @@ class SongTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-
-            // Favorite Quick Toggle
             IconButton(
               icon: Icon(
                 isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                color: isFav ? AppTheme.favoriteRed : AppTheme.textMuted.withOpacity(0.5),
+                color: isFav ? AppTheme.favoriteRed : AppTheme.textMuted.withOpacity(0.4),
                 size: 20,
               ),
               onPressed: () => playerService.toggleFavorite(song.id),
               splashRadius: 20,
             ),
-
-            // More Options Popup
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert_rounded, color: AppTheme.textMuted, size: 20),
-              color: AppTheme.surfaceElevated,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              onSelected: (value) {
-                if (value == 'play_next') {
-                  // Play next logic
-                  playerService.playSong(song);
-                } else if (value == 'add_playlist') {
-                  _showAddToPlaylistDialog(context, playerService, song.id);
-                } else if (value == 'info') {
-                  _showSongInfoDialog(context, song);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'add_playlist',
-                  child: Row(
-                    children: [
-                      Icon(Icons.playlist_add_rounded, color: AppTheme.textPrimary, size: 20),
-                      SizedBox(width: 12),
-                      Text('Add to Playlist'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'info',
-                  child: Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded, color: AppTheme.textPrimary, size: 20),
-                      SizedBox(width: 12),
-                      Text('Details & Path'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showAddToPlaylistDialog(BuildContext context, AudioPlayerService playerService, int songId) {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) {
-        final playlists = playerService.playlists;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Add to Playlist',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              if (playlists.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Text(
-                    'No playlists yet. Create one from the Playlists tab.',
-                    style: TextStyle(color: AppTheme.textMuted),
-                  ),
-                )
-              else
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: playlists.length,
-                  itemBuilder: (c, i) {
-                    final pl = playlists[i];
-                    final alreadyContains = pl.songIds.contains(songId);
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.queue_music_rounded, color: AppTheme.primary),
-                      title: Text(pl.name),
-                      trailing: alreadyContains
-                          ? const Icon(Icons.check_rounded, color: AppTheme.primary)
-                          : const Icon(Icons.add_rounded, color: AppTheme.textMuted),
-                      onTap: () {
-                        if (!alreadyContains) {
-                          playerService.addSongToPlaylist(pl.id, songId);
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Added to ${pl.name}')),
-                          );
-                        }
-                      },
-                    );
-                  },
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showSongInfoDialog(BuildContext context, SongItem song) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(song.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildInfoRow('Artist', song.artist),
-            _buildInfoRow('Album', song.album),
-            _buildInfoRow('Duration', song.formattedDuration),
-            if (song.data.isNotEmpty) _buildInfoRow('File Path', song.data),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close', style: TextStyle(color: AppTheme.primary)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-          Text(value, style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14)),
-        ],
       ),
     );
   }

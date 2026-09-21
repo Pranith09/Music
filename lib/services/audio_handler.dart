@@ -28,12 +28,11 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
   int get currentIndex => _currentIndex;
   SongItem? get currentSong => (_currentIndex >= 0 && _currentIndex < _playlist.length) ? _playlist[_currentIndex] : null;
 
-  AuraAudioHandler() {
+  MusicAudioHandler() {
     _initPlayer();
   }
 
   void _initPlayer() {
-    // Broadcast player state changes to AudioService & Notification
     _player.playbackEventStream.listen((PlaybackEvent event) {
       final playing = _player.playing;
       playbackState.add(playbackState.value.copyWith(
@@ -64,7 +63,6 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
       ));
     });
 
-    // Handle track completion
     _player.playerStateStream.listen((state) {
       if (state.processingState == ProcessingState.completed) {
         skipToNext();
@@ -76,7 +74,6 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
     _playlist = List.from(songs);
     _currentIndex = initialIndex;
 
-    // Update queue for AudioService
     queue.add(_playlist.map((song) => _songToMediaItem(song)).toList());
 
     if (_playlist.isNotEmpty && initialIndex >= 0 && initialIndex < _playlist.length) {
@@ -89,7 +86,6 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
     _currentIndex = index;
     final song = _playlist[index];
 
-    // Update current MediaItem for lock screen & notification
     mediaItem.add(_songToMediaItem(song));
 
     try {
@@ -101,12 +97,10 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
       );
       await _player.play();
     } catch (e) {
-      // Fallback directly to file path if URI fails
       try {
         await _player.setFilePath(song.data);
         await _player.play();
       } catch (err) {
-        // Try skipping to next song if this one fails to load
         skipToNext();
       }
     }
@@ -149,7 +143,7 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
     if (_playlist.isEmpty) return;
     int nextIndex = _currentIndex + 1;
     if (nextIndex >= _playlist.length) {
-      nextIndex = 0; // Loop back to start
+      nextIndex = 0;
     }
     await _playIndex(nextIndex);
   }
@@ -157,7 +151,6 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> skipToPrevious() async {
     if (_playlist.isEmpty) return;
-    // If playing for more than 3 seconds, restart current track
     if (_player.position.inSeconds > 3) {
       await seek(Duration.zero);
       return;

@@ -33,14 +33,12 @@ class AlbumDetailScreen extends StatelessWidget {
         children: [
           CustomScrollView(
             slivers: [
-              // Sliver App Bar with Header Art
               SliverAppBar(
-                expandedHeight: 280,
+                expandedHeight: 260,
                 pinned: true,
                 backgroundColor: AppTheme.surface,
                 flexibleSpace: FlexibleSpaceBar(
                   centerTitle: true,
-                  titlePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -50,19 +48,19 @@ class AlbumDetailScreen extends StatelessWidget {
                           type: artworkType,
                           artworkFit: BoxFit.cover,
                           nullArtworkWidget: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [AppTheme.surfaceElevated, AppTheme.background],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                            ),
+                            color: AppTheme.surfaceElevated,
                             child: const Center(
                               child: Icon(Icons.album_rounded, size: 80, color: AppTheme.textMuted),
                             ),
                           ),
+                        )
+                      else
+                        Container(
+                          color: AppTheme.surfaceElevated,
+                          child: const Center(
+                            child: Icon(Icons.folder_rounded, size: 80, color: AppTheme.accent),
+                          ),
                         ),
-                      // Gradient overlay
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -80,8 +78,6 @@ class AlbumDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Title and Action Buttons Header
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -90,25 +86,23 @@ class AlbumDetailScreen extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         '$subtitle • ${songs.length} Tracks',
                         style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
                       ),
-                      const SizedBox(height: 20),
-
-                      // Play All & Shuffle Buttons
+                      const SizedBox(height: 18),
                       Row(
                         children: [
                           Expanded(
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.primary,
+                                backgroundColor: AppTheme.accent,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                padding: const EdgeInsets.symmetric(vertical: 13),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
                               icon: const Icon(Icons.play_arrow_rounded, size: 24),
                               label: const Text('Play All', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -121,8 +115,8 @@ class AlbumDetailScreen extends StatelessWidget {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: AppTheme.textPrimary,
                                 side: const BorderSide(color: AppTheme.dividerColor),
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                padding: const EdgeInsets.symmetric(vertical: 13),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               ),
                               icon: const Icon(Icons.shuffle_rounded, size: 20),
                               label: const Text('Shuffle', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -137,8 +131,6 @@ class AlbumDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Songs List
               SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
@@ -148,15 +140,9 @@ class AlbumDetailScreen extends StatelessWidget {
                   childCount: songs.length,
                 ),
               ),
-
-              // Bottom Spacer for miniplayer
-              const SliverToBoxAdapter(
-                child: SizedBox(height: 100),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           ),
-
-          // Mini Player
           const Positioned(
             left: 0,
             right: 0,

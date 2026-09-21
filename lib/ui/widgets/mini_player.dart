@@ -37,12 +37,12 @@ class MiniPlayer extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceElevated.withOpacity(0.95),
+          color: AppTheme.surfaceElevated.withOpacity(0.96),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppTheme.dividerColor, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withOpacity(0.5),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -57,7 +57,6 @@ class MiniPlayer extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: Row(
                   children: [
-                    // Album Artwork
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: SizedBox(
@@ -68,15 +67,13 @@ class MiniPlayer extends StatelessWidget {
                           type: ArtworkType.AUDIO,
                           artworkFit: BoxFit.cover,
                           nullArtworkWidget: Container(
-                            color: AppTheme.primary.withOpacity(0.2),
-                            child: const Icon(Icons.music_note_rounded, color: AppTheme.primary, size: 24),
+                            color: AppTheme.accent.withOpacity(0.2),
+                            child: const Icon(Icons.music_note_rounded, color: AppTheme.accentGlow, size: 24),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    // Title & Artist
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,19 +102,15 @@ class MiniPlayer extends StatelessWidget {
                         ],
                       ),
                     ),
-
-                    // Play/Pause Button
                     IconButton(
                       icon: Icon(
                         isPlaying ? Icons.pause_circle_filled_rounded : Icons.play_circle_fill_rounded,
-                        color: AppTheme.primary,
+                        color: AppTheme.accentGlow,
                         size: 36,
                       ),
                       onPressed: () => playerService.togglePlayPause(),
                       splashRadius: 24,
                     ),
-
-                    // Skip Next Button
                     IconButton(
                       icon: const Icon(
                         Icons.skip_next_rounded,
@@ -130,8 +123,6 @@ class MiniPlayer extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Bottom Realtime Progress Line
               StreamBuilder<Duration>(
                 stream: playerService.positionStream,
                 builder: (context, snapshot) {
@@ -143,7 +134,7 @@ class MiniPlayer extends StatelessWidget {
                     value: progress,
                     minHeight: 2.5,
                     backgroundColor: Colors.transparent,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.accent),
                   );
                 },
               ),

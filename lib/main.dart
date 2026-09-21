@@ -11,7 +11,6 @@ import 'ui/theme/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Set system navigation bar & status bar transparent for AMOLED immersion
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -21,7 +20,6 @@ void main() async {
     ),
   );
 
-  // Initialize Core Services
   final audioHandler = await initAudioService();
   final storageService = await StorageService.init();
   final scannerService = MediaScannerService();

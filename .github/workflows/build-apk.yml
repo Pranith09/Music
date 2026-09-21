@@ -31,18 +31,18 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate Official Android Native Scaffold
+      - name: Generate Clean Android Native Layer
         run: |
           flutter config --no-analytics
-          # Generate fresh, official Flutter android scaffold matching the runner's SDK
+          # Scaffold pristine official Flutter android structure
           flutter create --org com.pranith --project-name music --platforms android temp_scaffold
           rm -rf android
           cp -r temp_scaffold/android android
           rm -rf temp_scaffold
 
-      - name: Configure Android Audio Permissions & Manifest
+      - name: Configure Android Audio Permissions & Service
         run: |
-          # Set minimum SDK to 23 for modern audio features
+          # Set minimum SDK to 23 for Android 13+ audio permissions
           sed -i 's/minSdkVersion .*/minSdkVersion 23/g' android/app/build.gradle || true
           sed -i 's/minSdkVersion = .*/minSdkVersion = 23/g' android/app/build.gradle || true
           sed -i 's/minSdk = .*/minSdk = 23/g' android/app/build.gradle || true
@@ -108,13 +108,13 @@ jobs:
           </manifest>
           EOF
 
-      - name: Install Flutter Dependencies
+      - name: Install Dependencies
         run: flutter pub get
 
       - name: Build Release APK
         run: flutter build apk --release
 
-      - name: Organize APK Output
+      - name: Organize Output
         run: |
           mkdir -p output-apks
           cp build/app/outputs/flutter-apk/app-release.apk output-apks/Music-RealmeNarzo60.apk

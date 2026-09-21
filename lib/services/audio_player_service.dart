@@ -16,6 +16,7 @@ class AudioPlayerService extends ChangeNotifier {
   List<SongItem> _filteredSongs = [];
   List<AlbumModel> _albums = [];
   List<ArtistModel> _artists = [];
+  List<FolderItem> _folders = [];
   Set<int> _favoriteIds = {};
   List<CustomPlaylist> _playlists = [];
   List<SongItem> _recentlyPlayedSongs = [];
@@ -23,7 +24,7 @@ class AudioPlayerService extends ChangeNotifier {
   bool _isLoading = true;
   bool _hasPermission = false;
   String _searchQuery = '';
-  SortOption _currentSort = SortOption.dateAdded;
+  SortOption _currentSort = SortOption.title;
   bool _isShuffle = false;
   RepeatMode _repeatMode = RepeatMode.off;
 
@@ -43,6 +44,7 @@ class AudioPlayerService extends ChangeNotifier {
   List<SongItem> get songs => _searchQuery.isEmpty ? _allSongs : _filteredSongs;
   List<AlbumModel> get albums => _albums;
   List<ArtistModel> get artists => _artists;
+  List<FolderItem> get folders => _folders;
   List<CustomPlaylist> get playlists => _playlists;
   List<SongItem> get favoriteSongs => _allSongs.where((s) => _favoriteIds.contains(s.id)).toList();
   List<SongItem> get recentlyPlayed => _recentlyPlayedSongs;
@@ -71,7 +73,6 @@ class AudioPlayerService extends ChangeNotifier {
     _playlists = _storageService.getPlaylists();
     _currentSort = _storageService.getSortOption();
 
-    // Listen to handler media item changes to update recent songs
     _audioHandler.mediaItem.listen((item) {
       if (item != null) {
         final id = int.tryParse(item.id);
@@ -83,7 +84,6 @@ class AudioPlayerService extends ChangeNotifier {
       }
     });
 
-    // Listen to player state
     _audioHandler.player.playerStateStream.listen((_) {
       notifyListeners();
     });
@@ -101,6 +101,7 @@ class AudioPlayerService extends ChangeNotifier {
       _allSongs = MediaScannerService.sortSongs(songs, _currentSort);
       _albums = await _scannerService.scanAlbums();
       _artists = await _scannerService.scanArtists();
+      _folders = MediaScannerService.groupSongsIntoFolders(_allSongs);
       _refreshRecentlyPlayed();
       _applySearch();
     }
@@ -113,14 +114,16 @@ class AudioPlayerService extends ChangeNotifier {
     final recentIds = _storageService.getRecentlyPlayed();
     _recentlyPlayedSongs = [];
     for (final id in recentIds) {
-      final song = _allSongs.firstWhere((s) => s.id == id, orElse: () => SongItem(id: -1, title: '', artist: '', album: '', duration: 0, uri: '', data: ''));
+      final song = _allSongs.firstWhere(
+        (s) => s.id == id,
+        orElse: () => SongItem(id: -1, title: '', artist: '', album: '', duration: 0, uri: '', data: ''),
+      );
       if (song.id != -1) {
         _recentlyPlayedSongs.add(song);
       }
     }
   }
 
-  // Playback Control
   Future<void> playSong(SongItem song, {List<SongItem>? contextPlaylist}) async {
     final list = contextPlaylist ?? songs;
     final index = list.indexWhere((s) => s.id == song.id);
@@ -194,7 +197,6 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Favorites
   bool isFavorite(int songId) => _favoriteIds.contains(songId);
 
   Future<void> toggleFavorite(int songId) async {
@@ -203,7 +205,6 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Playlists
   Future<void> createPlaylist(String name) async {
     final playlist = CustomPlaylist(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -228,17 +229,10 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> removeSongFromPlaylist(String playlistId, int songId) async {
-    await _storageService.removeSongFromPlaylist(playlistId, songId);
-    _playlists = _storageService.getPlaylists();
-    notifyListeners();
-  }
-
   List<SongItem> getSongsForPlaylist(CustomPlaylist playlist) {
     return _allSongs.where((s) => playlist.songIds.contains(s.id)).toList();
   }
 
-  // Search & Filter
   void setSearchQuery(String query) {
     _searchQuery = query;
     _applySearch();
@@ -266,7 +260,6 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Sleep Timer
   void setSleepTimer(Duration? duration) {
     _sleepTimer?.cancel();
     _sleepTimer = null;
@@ -289,9 +282,7 @@ class AudioPlayerService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void cancelSleepTimer() {
-    setSleepTimer(null);
-  }
+  void cancelSleepTimer() => setSleepTimer(null);
 
   @override
   void dispose() {

@@ -26,6 +26,8 @@ class PlayerScreen extends StatelessWidget {
     final isFav = playerService.isFavorite(song.id);
     final isShuffle = playerService.isShuffle;
     final repeatMode = playerService.repeatMode;
+    final queue = playerService.currentQueue;
+    final currentIndex = playerService.currentIndex;
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -39,13 +41,13 @@ class PlayerScreen extends StatelessWidget {
         title: Column(
           children: [
             const Text(
-              'PLAYING FROM DEVICE',
-              style: TextStyle(fontSize: 11, letterSpacing: 1.5, color: AppTheme.textMuted, fontWeight: FontWeight.w600),
+              'NOW PLAYING',
+              style: TextStyle(fontSize: 11, letterSpacing: 2.0, color: AppTheme.textMuted, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 2),
             Text(
               song.album,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
@@ -56,7 +58,7 @@ class PlayerScreen extends StatelessWidget {
           IconButton(
             icon: Icon(
               Icons.bedtime_outlined,
-              color: playerService.sleepTimerRemaining != null ? AppTheme.primary : AppTheme.textPrimary,
+              color: playerService.sleepTimerRemaining != null ? AppTheme.accentGlow : AppTheme.textPrimary,
             ),
             onPressed: () => SleepTimerSheet.show(context),
           ),
@@ -68,28 +70,28 @@ class PlayerScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Large Album Artwork with Ambient Glow
+              // Large Album Cover Art
               Center(
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.78,
-                  height: MediaQuery.of(context).size.width * 0.78,
+                  width: MediaQuery.of(context).size.width * 0.76,
+                  height: MediaQuery.of(context).size.width * 0.76,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.primary.withOpacity(0.35),
-                        blurRadius: 36,
+                        color: AppTheme.accent.withOpacity(0.25),
+                        blurRadius: 30,
                         spreadRadius: -4,
-                        offset: const Offset(0, 16),
+                        offset: const Offset(0, 12),
                       ),
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(20),
                     child: QueryArtworkWidget(
                       id: song.id,
                       type: ArtworkType.AUDIO,
@@ -97,13 +99,13 @@ class PlayerScreen extends StatelessWidget {
                       nullArtworkWidget: Container(
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFF2C1654), Color(0xFF130A24)],
+                            colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                         ),
                         child: const Center(
-                          child: Icon(Icons.music_note_rounded, size: 90, color: AppTheme.primaryAccent),
+                          child: Icon(Icons.album_rounded, size: 88, color: AppTheme.accentGlow),
                         ),
                       ),
                     ),
@@ -111,9 +113,9 @@ class PlayerScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-              // Title, Artist, and Favorite Button
+              // Title, Artist, Track Number & Favorite Button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -124,7 +126,7 @@ class PlayerScreen extends StatelessWidget {
                         Text(
                           song.title,
                           style: const TextStyle(
-                            fontSize: 22,
+                            fontSize: 21,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.textPrimary,
                             letterSpacing: -0.5,
@@ -132,11 +134,11 @@ class PlayerScreen extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
-                          song.artist,
+                          '${song.artist}${queue.isNotEmpty ? ' • ${currentIndex + 1} of ${queue.length}' : ''}',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             color: AppTheme.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
@@ -150,7 +152,7 @@ class PlayerScreen extends StatelessWidget {
                     icon: Icon(
                       isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                       color: isFav ? AppTheme.favoriteRed : AppTheme.textMuted,
-                      size: 28,
+                      size: 26,
                     ),
                     onPressed: () => playerService.toggleFavorite(song.id),
                   ),
@@ -167,11 +169,11 @@ class PlayerScreen extends StatelessWidget {
                   return ProgressBar(
                     progress: position,
                     total: total,
-                    progressBarColor: AppTheme.primary,
+                    progressBarColor: AppTheme.accent,
                     baseBarColor: AppTheme.dividerColor,
-                    thumbColor: AppTheme.primaryAccent,
-                    thumbGlowColor: AppTheme.primary.withOpacity(0.3),
-                    thumbRadius: 7.0,
+                    thumbColor: AppTheme.accentGlow,
+                    thumbGlowColor: AppTheme.accent.withOpacity(0.3),
+                    thumbRadius: 6.5,
                     timeLabelTextStyle: const TextStyle(
                       color: AppTheme.textMuted,
                       fontSize: 13,
@@ -184,62 +186,49 @@ class PlayerScreen extends StatelessWidget {
                 },
               ),
 
-              // Playback Action Controls
+              // Action Controls
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Shuffle Toggle
                   IconButton(
                     icon: Icon(
                       Icons.shuffle_rounded,
-                      color: isShuffle ? AppTheme.primary : AppTheme.textMuted,
-                      size: 26,
+                      color: isShuffle ? AppTheme.accentGlow : AppTheme.textMuted,
+                      size: 24,
                     ),
                     onPressed: () => playerService.toggleShuffle(),
                   ),
-
-                  // Previous Song
                   IconButton(
-                    icon: const Icon(Icons.skip_previous_rounded, size: 38, color: AppTheme.textPrimary),
+                    icon: const Icon(Icons.skip_previous_rounded, size: 36, color: AppTheme.textPrimary),
                     onPressed: () => playerService.playPrevious(),
                   ),
-
-                  // Play / Pause Large Glow Button
                   GestureDetector(
                     onTap: () => playerService.togglePlayPause(),
                     child: Container(
-                      width: 72,
-                      height: 72,
+                      width: 68,
+                      height: 68,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [AppTheme.primary, Color(0xFF6D28D9)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: AppTheme.accent,
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primary.withOpacity(0.5),
-                            blurRadius: 20,
-                            offset: const Offset(0, 6),
+                            color: AppTheme.accent.withOpacity(0.4),
+                            blurRadius: 18,
+                            offset: const Offset(0, 5),
                           ),
                         ],
                       ),
                       child: Icon(
                         isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
                         color: Colors.white,
-                        size: 40,
+                        size: 38,
                       ),
                     ),
                   ),
-
-                  // Next Song
                   IconButton(
-                    icon: const Icon(Icons.skip_next_rounded, size: 38, color: AppTheme.textPrimary),
+                    icon: const Icon(Icons.skip_next_rounded, size: 36, color: AppTheme.textPrimary),
                     onPressed: () => playerService.playNext(),
                   ),
-
-                  // Repeat Toggle
                   IconButton(
                     icon: Icon(
                       repeatMode == RepeatMode.one
@@ -247,14 +236,14 @@ class PlayerScreen extends StatelessWidget {
                           : repeatMode == RepeatMode.all
                               ? Icons.repeat_rounded
                               : Icons.repeat_rounded,
-                      color: repeatMode != RepeatMode.off ? AppTheme.primary : AppTheme.textMuted,
-                      size: 26,
+                      color: repeatMode != RepeatMode.off ? AppTheme.accentGlow : AppTheme.textMuted,
+                      size: 24,
                     ),
                     onPressed: () => playerService.toggleRepeat(),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
             ],
           ),
         ),
@@ -268,7 +257,7 @@ class PlayerScreen extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: AppTheme.surfaceElevated,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         final queue = playerService.currentQueue;
@@ -284,7 +273,7 @@ class PlayerScreen extends StatelessWidget {
               children: [
                 Container(
                   margin: const EdgeInsets.only(top: 12, bottom: 8),
-                  width: 40,
+                  width: 36,
                   height: 4,
                   decoration: BoxDecoration(
                     color: AppTheme.textMuted.withOpacity(0.4),
@@ -298,11 +287,11 @@ class PlayerScreen extends StatelessWidget {
                     children: [
                       const Text(
                         'Up Next Queue',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         '${queue.length} Tracks',
-                        style: const TextStyle(color: AppTheme.textMuted),
+                        style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
                       ),
                     ],
                   ),
@@ -318,7 +307,7 @@ class PlayerScreen extends StatelessWidget {
 
                       return ListTile(
                         leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(6),
                           child: SizedBox(
                             width: 40,
                             height: 40,
@@ -338,7 +327,7 @@ class PlayerScreen extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: isCurrent ? AppTheme.primaryAccent : AppTheme.textPrimary,
+                            color: isCurrent ? AppTheme.accentGlow : AppTheme.textPrimary,
                             fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
                           ),
                         ),
@@ -348,7 +337,7 @@ class PlayerScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: AppTheme.textMuted, fontSize: 12),
                         ),
-                        trailing: isCurrent ? const Icon(Icons.graphic_eq_rounded, color: AppTheme.primary) : null,
+                        trailing: isCurrent ? const Icon(Icons.graphic_eq_rounded, color: AppTheme.accent) : null,
                         onTap: () {
                           playerService.playSong(item);
                           Navigator.pop(ctx);

@@ -8,9 +8,7 @@ class MediaScannerService {
 
   OnAudioQuery get audioQuery => _audioQuery;
 
-  /// Check and request storage permissions (Android 13+ and older)
   Future<bool> checkAndRequestPermissions() async {
-    // Check permission status via on_audio_query and permission_handler
     bool hasPermission = await _audioQuery.permissionsStatus();
 
     if (!hasPermission) {
@@ -19,28 +17,25 @@ class MediaScannerService {
       } else if (await Permission.storage.request().isGranted) {
         hasPermission = true;
       } else {
-        // Fallback for Android 13+
         hasPermission = await _audioQuery.permissionsRequest();
       }
     }
     return hasPermission;
   }
 
-  /// Scan all songs on device
   Future<List<SongItem>> scanAllSongs({bool filterShortClips = true}) async {
     try {
       final songs = await _audioQuery.querySongs(
-        sortType: SongSortType.DATE_ADDED,
-        orderType: OrderType.DESC_OR_GREATER,
+        sortType: SongSortType.TITLE,
+        orderType: OrderType.ASC_OR_SMALLER,
         uriType: UriType.EXTERNAL,
         ignoreCase: true,
       );
 
       final List<SongItem> items = [];
       for (final song in songs) {
-        // Filter out short notification sounds / ringtones (< 10 seconds)
         if (filterShortClips && (song.duration ?? 0) < 10000) {
-          continue;
+          continue; // Skip clips under 10 seconds
         }
         items.add(SongItem.fromAudioQuery(song));
       }
@@ -51,7 +46,6 @@ class MediaScannerService {
     }
   }
 
-  /// Scan Albums
   Future<List<AlbumModel>> scanAlbums() async {
     try {
       return await _audioQuery.queryAlbums(
@@ -65,7 +59,6 @@ class MediaScannerService {
     }
   }
 
-  /// Scan Artists
   Future<List<ArtistModel>> scanArtists() async {
     try {
       return await _audioQuery.queryArtists(
@@ -79,7 +72,34 @@ class MediaScannerService {
     }
   }
 
-  /// Sort songs based on chosen option
+  /// Organizes songs into folders based on file directory path
+  static List<FolderItem> groupSongsIntoFolders(List<SongItem> songs) {
+    final Map<String, List<SongItem>> folderMap = {};
+
+    for (final song in songs) {
+      if (song.data.isEmpty) continue;
+      final parts = song.data.split('/');
+      if (parts.length > 1) {
+        final folderPath = parts.sublist(0, parts.length - 1).join('/');
+        final folderName = parts[parts.length - 2];
+        if (!folderMap.containsKey(folderPath)) {
+          folderMap[folderPath] = [];
+        }
+        folderMap[folderPath]!.add(song);
+      }
+    }
+
+    final List<FolderItem> folders = [];
+    folderMap.forEach((path, songsInFolder) {
+      final parts = path.split('/');
+      final name = parts.isNotEmpty ? parts.last : 'Music';
+      folders.add(FolderItem(name: name, path: path, songs: songsInFolder));
+    });
+
+    folders.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return folders;
+  }
+
   static List<SongItem> sortSongs(List<SongItem> songs, SortOption option) {
     final list = List<SongItem>.from(songs);
     switch (option) {

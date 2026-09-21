@@ -33,7 +33,7 @@ class SleepTimerSheet extends StatelessWidget {
             children: [
               const Row(
                 children: [
-                  Icon(Icons.bedtime_rounded, color: AppTheme.primary, size: 24),
+                  Icon(Icons.bedtime_rounded, color: AppTheme.accentGlow, size: 24),
                   SizedBox(width: 12),
                   Text(
                     'Sleep Timer',
@@ -48,14 +48,13 @@ class SleepTimerSheet extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-
           if (remaining != null) ...[
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.primary.withOpacity(0.15),
+                color: AppTheme.accent.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.primary.withOpacity(0.3)),
+                border: Border.all(color: AppTheme.accent.withOpacity(0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -63,7 +62,7 @@ class SleepTimerSheet extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Timer Active', style: TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                      const Text('Timer Active', style: TextStyle(color: AppTheme.accentGlow, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
                       Text(
                         'Music stops in ${_formatDuration(remaining)}',
@@ -88,13 +87,11 @@ class SleepTimerSheet extends StatelessWidget {
             ),
             const SizedBox(height: 16),
           ],
-
           const Text(
             'Stop music playback after:',
             style: TextStyle(color: AppTheme.textMuted, fontSize: 14),
           ),
           const SizedBox(height: 12),
-
           Wrap(
             spacing: 12,
             runSpacing: 12,
@@ -117,7 +114,7 @@ class SleepTimerSheet extends StatelessWidget {
       backgroundColor: AppTheme.cardColor,
       side: const BorderSide(color: AppTheme.dividerColor),
       label: Text(label, style: const TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600)),
-      avatar: const Icon(Icons.timer_outlined, size: 18, color: AppTheme.primary),
+      avatar: const Icon(Icons.timer_outlined, size: 18, color: AppTheme.accentGlow),
       onPressed: () {
         service.setSleepTimer(duration);
         Navigator.pop(context);
